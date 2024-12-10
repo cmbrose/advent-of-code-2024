@@ -7,53 +7,52 @@ import (
 	"main/util"
 )
 
-type game struct {
-	id    int
-	pulls []pullResult
-}
-
-type pullResult struct {
-	red, green, blue int
-}
-
 func main() {
-	lines := util.ReadInputLines("./input.txt")
-
-	games := util.Map(lines, func(line string) game {
-		gameSplit := strings.Split(line, ": ")
-
-		return game{
-			id: util.AssertInt(strings.Split(gameSplit[0], " ")[1]),
-			pulls: util.Map(strings.Split(gameSplit[1], "; "), func(pullString string) pullResult {
-				colors := strings.Split(pullString, ", ")
-				pull := pullResult{}
-
-				for _, color := range colors {
-					pair := strings.Split(color, " ")
-					switch pair[1] {
-					case "red":
-						pull.red = util.AssertInt(pair[0])
-					case "blue":
-						pull.blue = util.AssertInt(pair[0])
-					case "green":
-						pull.green = util.AssertInt(pair[0])
-					}
-				}
-
-				return pull
-			}),
-		}
+	reports := util.Map(util.ReadInputLines(), func(line string) []int {
+		return util.Map(strings.Split(line, " "), util.AssertInt)
 	})
 
-	powSum := 0
+	safe := util.Filter(reports, func(report []int) bool {
+		return isReportValid(report) || bruteForce(report)
+	})
 
-	for _, game := range games {
-		red := util.Max(util.Map(game.pulls, func(p pullResult) int { return p.red })...)
-		green := util.Max(util.Map(game.pulls, func(p pullResult) int { return p.green })...)
-		blue := util.Max(util.Map(game.pulls, func(p pullResult) int { return p.blue })...)
+	fmt.Printf("%d\n", len(safe))
+}
 
-		powSum += red * green * blue
+func bruteForce(report []int) bool {
+	for i := range report {
+		var reportWithout []int
+		reportWithout = append(reportWithout, report[:i]...)
+		reportWithout = append(reportWithout, report[i+1:]...)
+
+		if isReportValid(reportWithout) {
+			return true
+		}
+	}
+	return false
+}
+
+func isReportValid(report []int) bool {
+	sign := util.Sign(report[0] - report[1])
+
+	for i := 0; i < len(report)-1; i += 1 {
+		if !isPairValid(report[i], report[i+1], sign) {
+			return false
+		}
+	}
+	return true
+}
+
+func isPairValid(a, b, s int) bool {
+	diff := a - b
+	if s != util.Sign(diff) {
+		return false
 	}
 
-	fmt.Printf("%d\n", powSum)
+	abs := util.Abs(diff)
+	if abs < 1 || abs > 3 {
+		return false
+	}
+
+	return true
 }

@@ -24,8 +24,8 @@ func Check(err error) {
 	}
 }
 
-func ReadInputLines(path string) []string {
-	content, err := os.ReadFile(path)
+func ReadInputLines() []string {
+	content, err := os.ReadFile("./input.txt")
 	Check(err)
 
 	return strings.Split(string(content), "\n")
@@ -42,8 +42,8 @@ func ReadInputBlocks(f string) [][]string {
 	})
 }
 
-func ReadInputRuneGrid(f string) [][]rune {
-	lines := ReadInputLines(f)
+func ReadInputRuneGrid() [][]rune {
+	lines := ReadInputLines()
 
 	return Map(lines, func(line string) []rune { return []rune(line) })
 }
@@ -63,6 +63,17 @@ func Map[X, Y any](xArr []X, f func(X) Y) []Y {
 
 	for i, x := range xArr {
 		y := f(x)
+		yArr[i] = y
+	}
+
+	return yArr
+}
+
+func Zip[X, Y any](a, b []X, f func(X, X) Y) []Y {
+	yArr := make([]Y, len(a))
+
+	for i := range a {
+		y := f(a[i], b[i])
 		yArr[i] = y
 	}
 
@@ -298,7 +309,7 @@ func ExceptAll[T constraints.Ordered](a []T, b ...[]T) []T {
 func ParseIntGrid() [][]int {
 	grid := [][]int{}
 
-	for _, line := range ReadInputLines("./input.txt") {
+	for _, line := range ReadInputLines() {
 		row := []int{}
 		for _, cell := range line {
 			row = append(row, int(cell-'0'))

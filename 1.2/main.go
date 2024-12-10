@@ -2,75 +2,28 @@ package main
 
 import (
 	"fmt"
-	"strings"
-
 	"main/util"
+	"strings"
 )
 
 func main() {
-	curr := 0
+	left := make(map[int]int)
+	right := make(map[int]int)
 
-	for _, line := range util.ReadInputLines("./input.txt") {
-		var (
-			first = 0
-			last  = 0
-		)
+	for _, line := range util.ReadInputLines() {
+		parts := strings.Split(line, " ")
+		l := util.AssertInt(parts[0])
+		left[l] += 1
 
-		for i := 0; i < len(line); i += 1 {
-			if util.IsNumber(line[i]) {
-				n := (int)(line[i] - '0')
-				if first == 0 {
-					first = n
-				}
-				last = n
-			}
-
-			if n := GetNumberWord(line[i:]); n != -1 {
-				if first == 0 {
-					first = n
-				}
-				last = n
-			}
-		}
-
-		value := 10*first + last
-
-		fmt.Printf("%s -> %d, %d\n", line, first, last)
-
-		curr += value
+		r := util.AssertInt(parts[len(parts)-1])
+		right[r] += 1
 	}
 
-	fmt.Printf("%d\n", curr)
-}
-
-func GetNumberWord(s string) int {
-	if strings.HasPrefix(s, "one") {
-		return 1
-	}
-	if strings.HasPrefix(s, "two") {
-		return 2
-	}
-	if strings.HasPrefix(s, "three") {
-		return 3
-	}
-	if strings.HasPrefix(s, "four") {
-		return 4
-	}
-	if strings.HasPrefix(s, "five") {
-		return 5
-	}
-	if strings.HasPrefix(s, "six") {
-		return 6
-	}
-	if strings.HasPrefix(s, "seven") {
-		return 7
-	}
-	if strings.HasPrefix(s, "eight") {
-		return 8
-	}
-	if strings.HasPrefix(s, "nine") {
-		return 9
+	sum := 0
+	for k, lcnt := range left {
+		rcnt := right[k]
+		sum += k * lcnt * rcnt
 	}
 
-	return -1
+	fmt.Printf("%d\n", sum)
 }

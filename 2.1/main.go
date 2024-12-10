@@ -7,63 +7,26 @@ import (
 	"main/util"
 )
 
-type game struct {
-	id    int
-	pulls []pullResult
-}
-
-type pullResult struct {
-	red, green, blue int
-}
-
 func main() {
-	lines := util.ReadInputLines("./input.txt")
-
-	games := util.Map(lines, func(line string) game {
-		gameSplit := strings.Split(line, ": ")
-
-		return game{
-			id: util.AssertInt(strings.Split(gameSplit[0], " ")[1]),
-			pulls: util.Map(strings.Split(gameSplit[1], "; "), func(pullString string) pullResult {
-				colors := strings.Split(pullString, ", ")
-				pull := pullResult{}
-
-				for _, color := range colors {
-					pair := strings.Split(color, " ")
-					switch pair[1] {
-					case "red":
-						pull.red = util.AssertInt(pair[0])
-					case "blue":
-						pull.blue = util.AssertInt(pair[0])
-					case "green":
-						pull.green = util.AssertInt(pair[0])
-					}
-				}
-
-				return pull
-			}),
-		}
+	reports := util.Map(util.ReadInputLines(), func(line string) []int {
+		return util.Map(strings.Split(line, " "), util.AssertInt)
 	})
 
-	var (
-		maxRed   = 12
-		maxBlue  = 14
-		maxGreen = 13
-	)
+	safe := util.Filter(reports, func(report []int) bool {
+		sign := util.Sign(report[0] - report[1])
 
-	validIdSum := 0
-
-	for _, game := range games {
-		for _, pull := range game.pulls {
-			if pull.red > maxRed || pull.blue > maxBlue || pull.green > maxGreen {
-				goto end
+		for i := 0; i < len(report)-1; i += 1 {
+			diff := report[i] - report[i+1]
+			if sign != util.Sign(diff) {
+				return false
+			}
+			abs := util.Abs(diff)
+			if abs < 1 || abs > 3 {
+				return false
 			}
 		}
+		return true
+	})
 
-		validIdSum += game.id
-
-	end:
-	}
-
-	fmt.Printf("%d\n", validIdSum)
+	fmt.Printf("%d\n", len(safe))
 }

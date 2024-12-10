@@ -2,35 +2,24 @@ package main
 
 import (
 	"fmt"
-
 	"main/util"
+	"sort"
+	"strings"
 )
 
 func main() {
-	curr := 0
+	var left, right []int
 
-	for _, line := range util.ReadInputLines("./input.txt") {
-		var (
-			first rune
-			last  rune
-		)
-
-		for _, first = range line {
-			if util.IsNumber(first) {
-				break
-			}
-		}
-		for i := range line {
-			last = (rune)(line[len(line)-i-1])
-			if util.IsNumber(last) {
-				break
-			}
-		}
-
-		value := (int)(10*(first-'0') + (last - '0'))
-
-		curr += value
+	for _, line := range util.ReadInputLines() {
+		parts := strings.Split(line, " ")
+		left = append(left, util.AssertInt(parts[0]))
+		right = append(right, util.AssertInt(parts[len(parts)-1]))
 	}
 
-	fmt.Printf("%d\n", curr)
+	sort.Ints(left)
+	sort.Ints(right)
+
+	diffs := util.Zip(left, right, func(l, r int) int { return util.Abs(l - r) })
+
+	fmt.Printf("%d\n", util.Sum(diffs))
 }
