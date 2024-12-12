@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	for _, line := range util.ReadInputLines("./input.txt") {
+	for _, line := range util.ReadInputLines() {
 
 	}
 
