@@ -31,8 +31,8 @@ func ReadInputLines() []string {
 	return strings.Split(string(content), "\n")
 }
 
-func ReadInputBlocks(f string) [][]string {
-	content, err := os.ReadFile(f)
+func ReadInputBlocks() [][]string {
+	content, err := os.ReadFile("./input.txt")
 	Check(err)
 
 	blocks := strings.Split(string(content), "\n\n")
